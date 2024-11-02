@@ -1,4 +1,4 @@
-package com.example.GestionMagica;
+package com.example.GestionMagica.Entitys;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
