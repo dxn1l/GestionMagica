@@ -9,7 +9,7 @@
 
 ## Link del repositorio
 
-[https://github.com/erickgutierrez/GestionMagica](https://github.com/dxn1l/GestionMagica)
+https://github.com/dxn1l/GestionMagica.git
 
 ## Descripción
 
