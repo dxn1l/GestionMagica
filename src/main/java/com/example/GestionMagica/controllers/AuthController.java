@@ -1,4 +1,3 @@
-
 package com.example.GestionMagica.controllers;
 
 import com.example.GestionMagica.Entitys.User;
@@ -17,13 +16,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getUsername());
-
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok("Login exitoso");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
-        }
+        return ResponseEntity.ok("Login exitoso");
     }
 
     @PostMapping("/register")
@@ -32,8 +25,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en el registro: usuario ya existe");
         }
 
-        // Guarda el usuario directamente (asegúrate de cifrar la contraseña si es necesario)
         userRepository.save(newUser);
         return ResponseEntity.ok("Registro exitoso");
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<String> handleSecurityException(SecurityException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 }
