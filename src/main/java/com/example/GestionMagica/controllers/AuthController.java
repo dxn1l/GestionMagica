@@ -42,6 +42,21 @@ public class AuthController {
         return ResponseEntity.ok("Sesión invalidada con éxito");
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<User> getUser(@RequestHeader("Session-Id") String sessionId) {
+        String username = SessionManager.getUsername(sessionId);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<String> handleSecurityException(SecurityException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());

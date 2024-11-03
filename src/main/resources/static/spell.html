@@ -30,6 +30,7 @@
 <body>
 
 <div class="spell-container">
+  <h2 class="text-center" id="welcomeMessage"></h2>
   <h2 class="text-center">Lanzar Hechizos</h2>
   <div id="spellList" class="mt-4">
     <button class="btn btn-primary btn-block" onclick="castSpell('accio')">Lanzar Accio</button>
@@ -48,6 +49,25 @@
 </div>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sessionId = localStorage.getItem('sessionId');
+    fetch(`/auth/user`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Session-Id': sessionId
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              const welcomeMessage = `Bienvenido ${data.role} : ${data.username}`;
+              document.getElementById('welcomeMessage').innerText = welcomeMessage;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+  });
+
   function castSpell(spellName) {
     const sessionId = localStorage.getItem('sessionId');
     fetch(`/spells/cast`, {
