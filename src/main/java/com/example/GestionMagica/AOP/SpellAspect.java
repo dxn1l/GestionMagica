@@ -3,7 +3,7 @@ package com.example.GestionMagica.AOP;
 import com.example.GestionMagica.Manager.SessionManager;
 import com.example.GestionMagica.Repository.UserRepository;
 import com.example.GestionMagica.controllers.SpellController.SpellRequest;
-import com.example.GestionMagica.Entitys.User;
+import com.example.GestionMagica.Entities.User;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.After;

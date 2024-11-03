@@ -2,7 +2,7 @@ package com.example.GestionMagica.controllers;
 
 import com.example.GestionMagica.Manager.SessionManager;
 import com.example.GestionMagica.Repository.UserRepository;
-import com.example.GestionMagica.Entitys.User;
+import com.example.GestionMagica.Entities.User;
 import com.example.GestionMagica.loc.Spell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

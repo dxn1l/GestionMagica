@@ -1,6 +1,6 @@
 package com.example.GestionMagica.AOP;
 
-import com.example.GestionMagica.Entitys.User;
+import com.example.GestionMagica.Entities.User;
 import com.example.GestionMagica.Repository.UserRepository;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
