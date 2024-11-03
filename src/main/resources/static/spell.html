@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Mágico - Lanzar Hechizos</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f8f9fa;
+    }
+    .spell-container {
+      max-width: 400px;
+      width: 100%;
+      padding: 20px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="spell-container">
+  <h2 class="text-center" id="welcomeMessage"></h2>
+  <h2 class="text-center">Lanzar Hechizos</h2>
+  <div id="spellList" class="mt-4">
+    <button class="btn btn-primary btn-block" onclick="castSpell('accio')">Lanzar Accio</button>
+    <button class="btn btn-primary btn-block" onclick="castSpell('aguamenti')">Lanzar Aguamenti</button>
+    <button class="btn btn-primary btn-block" onclick="castSpell('alohomora')">Lanzar Alohomora</button>
+    <button class="btn btn-primary btn-block" onclick="castSpell('crucio')">Lanzar Crucio</button>
+  </div>
+  <div id="message" class="mt-3"></div>
+  <div class="loading" id="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Cargando...</span>
+    </div>
+    <p>Redirigiendo a la página de inicio de sesión...</p>
+  </div>
+  <button class="btn btn-danger btn-block mt-3" onclick="logout()">Cerrar Sesión</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sessionId = localStorage.getItem('sessionId');
+    fetch(`/auth/user`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Session-Id': sessionId
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              const welcomeMessage = `Bienvenido ${data.role} : ${data.username}`;
+              document.getElementById('welcomeMessage').innerText = welcomeMessage;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+  });
+
+  function castSpell(spellName) {
+    const sessionId = localStorage.getItem('sessionId');
+    fetch(`/spells/cast`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Session-Id': sessionId
+      },
+      body: JSON.stringify({ spell: spellName }),
+    })
+            .then(response => {
+              if (response.status === 401) {
+                localStorage.removeItem('sessionId');
+                document.getElementById('message').innerHTML = `<div class="alert alert-danger">No ha iniciado sesión</div>`;
+                document.getElementById('spellList').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                setTimeout(() => {
+                  window.location.href = '/login.html';
+                }, 5000);
+                throw new Error('No ha iniciado sesión');
+              }
+              return response.text();
+            })
+            .then(data => {
+              document.getElementById('message').innerHTML = `<div class="alert alert-success">${data}</div>`;
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+  }
+
+  function logout() {
+    localStorage.removeItem('sessionId');
+    window.location.href = '/login.html';
+  }
+</script>
+
+</body>
+</html>
