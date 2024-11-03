@@ -2,7 +2,8 @@ package com.example.GestionMagica.controllers;
 
 import com.example.GestionMagica.Manager.SessionManager;
 import com.example.GestionMagica.Repository.UserRepository;
-import com.example.GestionMagica.Entitys.User;
+import com.example.GestionMagica.Entities.User;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User loginRequest) {
         User user = userRepository.findByUsername(loginRequest.getUsername());
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
+        if (user != null && BCrypt.checkpw(loginRequest.getPassword(), user.getPassword())) {
             String sessionId = SessionManager.createSession(user.getUsername());
             return ResponseEntity.ok(sessionId);
         } else {
@@ -32,6 +33,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya existe");
         }
 
+        // Encriptar la contraseña antes de guardarla
+        String hashedPassword = BCrypt.hashpw(newUser.getPassword(), BCrypt.gensalt());
+        newUser.setPassword(hashedPassword);
         userRepository.save(newUser);
         return ResponseEntity.ok("Usuario registrado con exito");
     }
