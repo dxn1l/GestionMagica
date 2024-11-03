@@ -16,8 +16,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User loginRequest) {
-        return ResponseEntity.ok("Login exitoso");
+        User user = userRepository.findByUsername(loginRequest.getUsername());
+
+        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity.ok("Login exitoso, redirigiendo a /spells");
+
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User newUser) {
