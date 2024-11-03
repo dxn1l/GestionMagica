@@ -7,9 +7,10 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.JoinPoint;
 
 @Aspect
 @Component
@@ -21,7 +22,7 @@ public class SpellAspect {
     @Before("castSpellPointcut(spellRequest, sessionId)")
     public void beforeCastSpell(SpellRequest spellRequest, String sessionId) {
         String username = SessionManager.getUsername(sessionId);
-        System.out.println("B : Castear hechizo: " + spellRequest.getSpell() + " por parte del usuario: " + username);
+        System.out.println("B : Casteando hechizo: " + spellRequest.getSpell() + " por parte del usuario: " + username);
     }
 
     @After("castSpellPointcut(spellRequest, sessionId)")
@@ -33,6 +34,10 @@ public class SpellAspect {
     @Around("castSpellPointcut(spellRequest, sessionId)")
     public Object aroundCastSpell(ProceedingJoinPoint joinPoint, SpellRequest spellRequest, String sessionId) throws Throwable {
         String username = SessionManager.getUsername(sessionId);
+        if (username == null) {
+            System.out.println("\n" + "Inicie sesión");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
         System.out.println("\n" + "Ar : Inicio de hechizo: " + spellRequest.getSpell() + " por parte del usuario: " + username);
         Object result = joinPoint.proceed();
         System.out.println("Ar : Finalización de hechizo: " + spellRequest.getSpell() + " por parte del usuario: " + username + "\n");
