@@ -1,6 +1,8 @@
 package com.example.GestionMagica.controllers;
 
 import com.example.GestionMagica.Manager.SessionManager;
+import com.example.GestionMagica.Repository.UserRepository;
+import com.example.GestionMagica.Entitys.User;
 import com.example.GestionMagica.loc.Spell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -15,11 +17,23 @@ public class SpellController {
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("/cast")
     public ResponseEntity<String> castSpell(@RequestBody SpellRequest spellRequest, @RequestHeader("Session-Id") String sessionId) {
         String username = SessionManager.getUsername(sessionId);
         if (username == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        if ("estudiante".equals(user.getRole()) && ("crucio".equals(spellRequest.getSpell()) || "alohomora".equals(spellRequest.getSpell()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Estudiantes no pueden usar este hechizo");
         }
 
         Spell spell = (Spell) context.getBean(spellRequest.getSpell().toLowerCase());
