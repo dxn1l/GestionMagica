@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,10 @@ public class LoginAspect {
     @Autowired
     private UserRepository userRepository;
 
-    @Before("execution(* com.example.GestionMagica.controllers.AuthController.login(..)) && args(user,..)")
+    @Pointcut("execution(* com.example.GestionMagica.controllers.AuthController.login(..)) && args(user,..)")
+    public void loginPointcut(User user) {}
+
+    @Before("loginPointcut(user)")
     public void beforeLogin(User user) {
         User foundUser = userRepository.findByUsername(user.getUsername());
         if (foundUser == null || !foundUser.getPassword().equals(user.getPassword())) {
@@ -27,16 +31,17 @@ public class LoginAspect {
         }
     }
 
-    @After("execution(* com.example.GestionMagica.controllers.AuthController.login(..)) && args(user,..)")
+    @After("loginPointcut(user)")
     public void afterLogin(User user) {
         System.out.println("Af : Login exitoso del usuario: " + user.getUsername());
     }
 
-    @Around("execution(* com.example.GestionMagica.controllers.AuthController.login(..)) && args(user,..)")
+    @Around("loginPointcut(user)")
     public Object aroundLogin(ProceedingJoinPoint joinPoint, User user) throws Throwable {
-        System.out.println("Ar : Intentando login para el usuario: " + user.getUsername());
+
+        System.out.println("\n" + "Ar : Intentando login para el usuario: " + user.getUsername());
         Object result = joinPoint.proceed();
-        System.out.println("Ar : Login completado para el usuario: " + user.getUsername());
+        System.out.println("Ar : Login completado para el usuario: " + user.getUsername() + "\n");
         return result;
     }
 }

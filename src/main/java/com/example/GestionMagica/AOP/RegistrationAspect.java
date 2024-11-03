@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,10 @@ public class RegistrationAspect {
     @Autowired
     private UserRepository userRepository;
 
-    @Before("execution(* com.example.GestionMagica.controllers.AuthController.register(..)) && args(user,..)")
+    @Pointcut("execution(* com.example.GestionMagica.controllers.AuthController.register(..)) && args(user,..)")
+    public void registerPointcut(User user) {}
+
+    @Before("registerPointcut(user)")
     public void beforeRegister(User user) {
         User foundUser = userRepository.findByUsername(user.getUsername());
         if (foundUser != null) {
@@ -27,16 +31,16 @@ public class RegistrationAspect {
         }
     }
 
-    @After("execution(* com.example.GestionMagica.controllers.AuthController.register(..)) && args(user,..)")
+    @After("registerPointcut(user)")
     public void afterRegister(User user) {
         System.out.println("Af : Registro exitoso del usuario: " + user.getUsername());
     }
 
-    @Around("execution(* com.example.GestionMagica.controllers.AuthController.register(..)) && args(user,..)")
+    @Around("registerPointcut(user)")
     public Object aroundRegister(ProceedingJoinPoint joinPoint, User user) throws Throwable {
-        System.out.println("Ar : Inicio de registro para el usuario: " + user.getUsername());
+        System.out.println("\n" + "Ar : Inicio de registro para el usuario: " + user.getUsername());
         Object result = joinPoint.proceed();
-        System.out.println("Ar : Finalización de registro para el usuario: " + user.getUsername());
+        System.out.println("Ar : Finalización de registro para el usuario: " + user.getUsername() + "\n");
         return result;
     }
 }

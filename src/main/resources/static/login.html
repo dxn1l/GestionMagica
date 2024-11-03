@@ -76,9 +76,10 @@
                     throw new Error('Credenciales inválidas');
                 }
             })
-            .then(data => {
-                document.getElementById('message').innerHTML = `<div class="alert alert-success">${data}</div>`;
-                // Aquí puedes redirigir al usuario a otra página
+            .then(sessionId => {
+                localStorage.setItem('sessionId', sessionId);
+                document.getElementById('message').innerHTML = `<div class="alert alert-success">Login exitoso</div>`;
+                window.location.href = '/spell.html'; // Redirect to spells page
             })
             .catch(error => {
                 document.getElementById('message').innerHTML = `<div class="alert alert-danger">${error.message}</div>`;

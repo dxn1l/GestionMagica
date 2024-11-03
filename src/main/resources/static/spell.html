@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema MÃ¡gico - Lanzar Hechizos</title>
+  <title>Sistema Mágico - Lanzar Hechizos</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
     body {
@@ -31,14 +31,17 @@
     <button class="btn btn-primary btn-block" onclick="castSpell('Crucio')">Lanzar Crucio</button>
   </div>
   <div id="message" class="mt-3"></div>
+  <button class="btn btn-danger btn-block mt-3" onclick="logout()">Cerrar Sesión</button>
 </div>
 
 <script>
   function castSpell(spellName) {
+    const sessionId = localStorage.getItem('sessionId');
     fetch(`/spells/cast`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Session-Id': sessionId
       },
       body: JSON.stringify({ spell: spellName }),
     })
@@ -51,6 +54,28 @@
             })
             .then(data => {
               document.getElementById('message').innerHTML = `<div class="alert alert-success">${data}</div>`;
+            })
+            .catch(error => {
+              document.getElementById('message').innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            });
+  }
+
+
+  function logout() {
+    const sessionId = localStorage.getItem('sessionId');
+    fetch('/auth/logout', {
+      method: 'POST',
+      headers: {
+        'Session-Id': sessionId
+      }
+    })
+            .then(response => {
+              if (response.ok) {
+                localStorage.removeItem('sessionId');
+                window.location.href = '/login.html';
+              } else {
+                throw new Error('Error al cerrar sesión');
+              }
             })
             .catch(error => {
               document.getElementById('message').innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
